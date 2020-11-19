@@ -53,7 +53,7 @@ class UCAS_AODDataset(data.Dataset):
         
         for i, bbox in enumerate(bboxes):
             gt_boxes[i, :5] = quad_2_rbox(np.array(bbox), mode = 'xyxya')   
-            gt_boxes[:, 5] = classes[i]
+            gt_boxes[i, 5] = classes[i]
 
         ## test augmentation
         # plot_gt(im, gt_boxes[:,:-1], im_path, mode = 'xyxya')

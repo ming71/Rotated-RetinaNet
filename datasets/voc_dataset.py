@@ -53,7 +53,7 @@ class VOCDataset(data.Dataset):
         gt_boxes = np.empty((len(gt_inds), 6), dtype=np.float32)
         for i, bbox in enumerate(bboxes):
             gt_boxes[i, :5] = quad_2_rbox(np.array(bbox))
-            gt_boxes[:, 5] = classes[i]
+            gt_boxes[i, 5] = classes[i]
         return {'image': im, 'boxes': gt_boxes}
 
     def _load_image_names(self):

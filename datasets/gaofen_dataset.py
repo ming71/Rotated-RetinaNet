@@ -56,7 +56,7 @@ class GaoFenShipDataset(data.Dataset):
             classes = classes[mask]
 
             for i, bbox in enumerate(bboxes):
-                gt_boxes[:, 5] = classes[i]
+                gt_boxes[i, 5] = classes[i]
             gt_boxes = constraint_theta(gt_boxes)
             cx, cy, w, h = [gt_boxes[:, x] for x in range(4)]      
             x1 = cx - 0.5*w

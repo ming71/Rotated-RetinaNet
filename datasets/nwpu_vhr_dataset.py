@@ -51,7 +51,7 @@ class NWPUDataset(data.Dataset):
 
         for i, bbox in enumerate(bboxes):
             gt_boxes[i, :5] = quad_2_rbox(np.array(bbox), mode = 'xyxya')   # 四点转xyxya（a为角度制）
-            gt_boxes[:, 5] = classes[i]
+            gt_boxes[i, 5] = classes[i]
 
         ## test augmentation
         # print(im.shape)
