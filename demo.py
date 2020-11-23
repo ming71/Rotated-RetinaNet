@@ -71,6 +71,9 @@ def demo(args):
                         c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 5
                         cv2.rectangle(src, c1, c2, [0,255,0], -1)  # filled
                         cv2.putText(src, label, (c1[0], c1[1] -5), font, fontScale, [0, 0, 0], thickness=thickness, lineType=cv2.LINE_AA)
+                        if plot_anchor:
+                            pts = np.array([rbox_2_quad(bbox[5:]).reshape((4, 2))], dtype=np.int32)
+                            cv2.drawContours(src, pts, 0, color=(0, 0, 255), thickness=2)
 
             print('%sDone. (%.3fs) %d objs' % (s, time.time() - t, len(cls_dets)))
             # save image
