@@ -17,7 +17,7 @@ Note that VOC07 metric is used for evaluation.
 | UCAS-AOD         | OBB  |ResNet-50  | 800 x 800  | 87.57     |
 | ICDAR 2013       | OBB  |ResNet-50 | 800 x 800  | 77.20    |
 | ICDAR 2015       | HBB  |ResNet-50 | 800 x 800  | 77.50 |
-| NWPU VHR-10      | HBB  |ResNet-50 | 800 x 800  | 84.32 |
+| NWPU VHR-10      | HBB  |ResNet-50 | 800 x 800  | 86.40 |
 
 Note that VOC07 metric is used for HRSC2016, UCAS-AOD, NWPU VHR-10, F1 score for IC13 and IC13. 3 anchors are preset for each location in feature maps. All experiments are conducted with data augmentation including random flip, rotation and HSV color space transform.
 
@@ -31,7 +31,16 @@ cd $ROOT/utils
 sh make.sh
 ```
 
+Install DotaDevKit:
+
+```
+sudo apt-get install swig
+swig -c++ -python polyiou.i
+python setup.py build_ext --inplace
+```
+
 ### Inference
+
 ```
 python demo.py
 ```
