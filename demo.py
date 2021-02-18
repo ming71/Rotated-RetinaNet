@@ -26,10 +26,29 @@ DATASETS = {'VOC' : VOCDataset ,
             'NWPU_VHR':NWPUDataset
             }
 
+def generate_colors(dataset):
+    num_colors = {'VOC' : 20 ,
+            'IC15': 1,
+            'IC13': 1,
+            'HRSC2016': 1,
+            'DOTA':15,
+            'UCAS_AOD':2,
+            'NWPU_VHR':10
+            }
+    if num_colors[dataset] == 1:
+        colors = [(0, 255, 0)]
+    elif num_colors[dataset] == 2:
+        colors = [(0, 255, 0), (0, 0, 255)]
+    else:
+        colors = [[random.randint(0, 255) for _ in range(3)] for _ in range(num_colors[dataset])]
+    return colors
+
+
 def demo(args):
     hyps = hyp_parse(args.hyp)
     ds = DATASETS[args.dataset](level = 1)
     model = RetinaNet(backbone=args.backbone, hyps=hyps)
+    colors = generate_colors(args.dataset)
     if args.weight.endswith('.pth'):
         chkpt = torch.load(args.weight)
         # load model
@@ -59,22 +78,24 @@ def demo(args):
                     cv2.rectangle(src, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), color=(0, 0, 255), thickness=2)
                 else:
                     pts = np.array([rbox_2_quad(bbox[:5]).reshape((4, 2))], dtype=np.int32)
-                    cv2.drawContours(src, pts, 0, color=(0, 255, 0), thickness=2)
+                    cv2.drawContours(src, pts, 0, thickness=2, color=colors[int(cls-1)])
                     put_label = True
+                    plot_anchor = False
                     if put_label:
                         label = ds.return_class(cls) + str(' %.2f' % scores)
-                        fontScale = 0.7
+                        fontScale = 0.45
                         font = cv2.FONT_HERSHEY_COMPLEX
                         thickness = 1
                         t_size = cv2.getTextSize(label, font, fontScale=fontScale, thickness=thickness)[0]
                         c1 = tuple(bbox[:2].astype('int'))
                         c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 5
-                        cv2.rectangle(src, c1, c2, [0,255,0], -1)  # filled
-                        cv2.putText(src, label, (c1[0], c1[1] -5), font, fontScale, [0, 0, 0], thickness=thickness, lineType=cv2.LINE_AA)
+                        # import ipdb;ipdb.set_trace()
+
+                        cv2.rectangle(src, c1, c2, colors[int(cls-1)], -1)  # filled
+                        cv2.putText(src, label, (c1[0], c1[1] -4), font, fontScale, [0, 0, 0], thickness=thickness, lineType=cv2.LINE_AA)
                         if plot_anchor:
                             pts = np.array([rbox_2_quad(bbox[5:]).reshape((4, 2))], dtype=np.int32)
                             cv2.drawContours(src, pts, 0, color=(0, 0, 255), thickness=2)
-
             print('%sDone. (%.3fs) %d objs' % (s, time.time() - t, len(cls_dets)))
             # save image
 
@@ -108,23 +129,22 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Hyperparams')
     parser.add_argument('--backbone', type=str, default='res50')
     parser.add_argument('--hyp', type=str, default='hyp.py', help='hyper-parameter path')
-    # parser.add_argument('--weight', type=str, default='weights/NWPU_88.1_das.pth')
     parser.add_argument('--weight', type=str, default='weights/last.pth')
     # HRSC
     # parser.add_argument('--dataset', type=str, default='HRSC2016')    
     # parser.add_argument('--ims_dir', type=str, default='HRSC2016/Test') 
     # DOTA 
-#     parser.add_argument('--dataset', type=str, default='DOTA')
-#     parser.add_argument('--ims_dir', type=str, default='DOTA/test')
+    # parser.add_argument('--dataset', type=str, default='DOTA')
+    # parser.add_argument('--ims_dir', type=str, default='DOTA/test')
     # UCAS-AOD
-    # parser.add_argument('--dataset', type=str, default='UCAS_AOD')
-    # parser.add_argument('--ims_dir', type=str, default='UCAS_AOD/demo')  
+    parser.add_argument('--dataset', type=str, default='UCAS_AOD')
+    parser.add_argument('--ims_dir', type=str, default='UCAS_AOD/Test')  
     # IC13
-#     parser.add_argument('--dataset', type=str, default='IC13')
-#     parser.add_argument('--ims_dir', type=str, default='ICDAR13/test')
+    # parser.add_argument('--dataset', type=str, default='IC13')
+    # parser.add_argument('--ims_dir', type=str, default='ICDAR13/test')
     # NWPU
-    parser.add_argument('--dataset', type=str, default='HRSC2016')
-    parser.add_argument('--ims_dir', type=str, default='samples')   
+    # parser.add_argument('--dataset', type=str, default='HRSC2016')
+    # parser.add_argument('--ims_dir', type=str, default='HRSC2016/Test')   
     
 
 
