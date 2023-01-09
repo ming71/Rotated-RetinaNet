@@ -87,6 +87,11 @@ def train_model(args, hyps):
     scheduler = WarmupLR(scheduler, init_lr=hyps['warmup_lr'], num_warmup=hyps['warm_epoch'], warmup_strategy='cos')
     scheduler.last_epoch = start_epoch - 1
 
+    if torch.cuda.is_available():
+        model.cuda()
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model).cuda()
+   
     # load chkpt
     if weight.endswith('.pth'):
         chkpt = torch.load(weight)
@@ -112,11 +117,6 @@ def train_model(args, hyps):
 
         del chkpt
  
-    if torch.cuda.is_available():
-        model.cuda()
-    if torch.cuda.device_count() > 1:
-        model = torch.nn.DataParallel(model).cuda()
-   
 
     if mixed_precision:
         model, optimizer = amp.initialize(model, optimizer, opt_level='O1', verbosity=0)

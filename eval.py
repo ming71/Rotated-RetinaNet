@@ -215,6 +215,11 @@ def evaluate(target_size,
              conf=0.3):
     if model is None:
         model = RetinaNet(backbone=backbone,hyps=hyps)
+        if torch.cuda.is_available():
+            model.cuda()
+        if torch.cuda.device_count() > 1:
+            model = torch.nn.DataParallel(model).cuda()
+            
         if weight.endswith('.pth'):
             chkpt = torch.load(weight)
             # load model
@@ -224,8 +229,6 @@ def evaluate(target_size,
                 model.load_state_dict(chkpt)
 
     model.eval()
-    if torch.cuda.is_available():
-        model.cuda()
 
     if 'IC' in dataset :
         results = icdar_evaluate(model, target_size, test_path, dataset)
